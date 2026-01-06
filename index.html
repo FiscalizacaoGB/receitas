@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Gerencial - Cidade Sol</title>
+
+<style>
+/* ===== ESTILO ORIGINAL (SEM ALTERAÇÃO) ===== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+}
+header {
+  background: #0b2545;
+  padding: 10px 20px;
+}
+header img { height: 50px; }
+section { padding: 20px; }
+
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.card {
+  background: #fff;
+  border-left: 5px solid #0b2545;
+  padding: 12px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" alt="Cidade Sol">
+</header>
+
+<section>
+  <h2>Resumo de Linhas</h2>
+
+  <div class="cards-resumo">
+    <div class="card" id="cardReceita"></div>
+    <div class="card" id="cardKm"></div>
+    <div class="card" id="cardPax"></div>
+    <div class="card" id="cardRkm"></div>
+  </div>
+</section>
+
+</body>
+</html>
