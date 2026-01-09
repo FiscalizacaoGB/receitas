@@ -191,8 +191,12 @@ const URL_LINHAS =
 function moeda(v) {
   return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
-function decimal(v,c=2){
-  return Number(v).toLocaleString("pt-BR",{minimumFractionDigits:c});
+function decimal(v, c = 2){
+  return Number(v).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
 }
 function soma(arr,campo){
   return arr.reduce((t,i)=>t+(Number(i[campo])||0),0);
@@ -279,7 +283,7 @@ const rkmMedio = totalKm ? receitaTotalReal / totalKm : 0;
   <td>${decimal(l.Qtd_Pax,0)}</td>
   <td>${decimal(l["R$/KM"],2)}</td>
   <td class="${diff === null ? "" : diff >= 0 ? "positivo" : "negativo"}">
-    ${diff === null ? "-" : diff.toFixed(1) + "%"}
+    ${diff === null ? "-" : diff.toFixed(2) + "%"}
   </td>
 </tr>`;
   });
