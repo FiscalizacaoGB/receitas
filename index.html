@@ -206,7 +206,10 @@ async function buscarLinhas(){
   const thSeguro = document.getElementById("thSeguro");
   const tbody = document.getElementById("tbody");
 
-  if(!ano||!mes){alert("Selecione ano e mês");return;}
+  if(!ano||!mes){
+    alert("Selecione ano e mês");
+    return;
+  }
 
   tbody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
 
@@ -214,22 +217,31 @@ async function buscarLinhas(){
   const dados = await res.json();
 
   const atual = dados.filter(l =>
-    l.Ano===ano && l.Mês===mes && (grupo==="todos"||l.Grupo===grupo)
-  ).map(l=>{
-    const tarifa = Number(l.Tarifa)||0;
-    const seguro = Number(l.Seguro)||0;
-    return {...l,
-      ReceitaCalc: somarSeguro ? tarifa+seguro : tarifa,
+    l.Ano === ano &&
+    l.Mês === mes &&
+    (grupo === "todos" || l.Grupo === grupo)
+  ).map(l => {
+    const tarifa = Number(l.Tarifa) || 0;
+    const seguro = Number(l.Seguro) || 0;
+
+    return {
+      ...l,
+      ReceitaCalc: somarSeguro ? tarifa + seguro : tarifa,
       SeguroCalc: seguro
     };
   });
 
-  thSeguro.style.display = somarSeguro ? "none":"table-cell";
+  thSeguro.style.display = somarSeguro ? "none" : "table-cell";
 
+  /* ===== CARDS ===== */
   const totalReceita = atual.reduce((t,i)=>t+i.ReceitaCalc,0);
   const totalKm = soma(atual,"Km_Rodado");
   const totalPax = soma(atual,"Qtd_Pax");
-  const rkmMedio = totalKm ? totalReceita/totalKm : 0;
+
+  // ✅ R$/KM médio EXTRAÍDO da planilha (média simples)
+  const rkmMedio = atual.length
+    ? soma(atual,"R$/KM") / atual.length
+    : 0;
 
   cardReceita.innerText = moeda(totalReceita);
   cardKm.innerText = decimal(totalKm,0);
@@ -238,19 +250,34 @@ async function buscarLinhas(){
 
   tbody.innerHTML = "";
 
-  atual.forEach(l=>{
+  atual.forEach(l => {
+
+    // 🔁 Comparação com mês anterior usando R$/KM da planilha
+    const ant = dados.find(a =>
+      a.Linha === l.Linha &&
+      a.Ano === ano - 1 &&
+      a.Mês === mes
+    );
+
+    const diff = ant
+      ? ((l["R$/KM"] - ant["R$/KM"]) / ant["R$/KM"]) * 100
+      : null;
+
     tbody.innerHTML += `
 <tr>
-<td>${l.Linha}</td>
-<td>${moeda(l.ReceitaCalc)}</td>
-${somarSeguro?"":`<td>${moeda(l.SeguroCalc)}</td>`}
-<td>${decimal(l.Km_Rodado,0)}</td>
-<td>${decimal(l.Qtd_Pax,0)}</td>
-<td>${decimal(l.ReceitaCalc/l.Km_Rodado,2)}</td>
-<td>-</td>
+  <td>${l.Linha}</td>
+  <td>${moeda(l.ReceitaCalc)}</td>
+  ${somarSeguro ? "" : `<td>${moeda(l.SeguroCalc)}</td>`}
+  <td>${decimal(l.Km_Rodado,0)}</td>
+  <td>${decimal(l.Qtd_Pax,0)}</td>
+  <td>${decimal(l["R$/KM"],2)}</td>
+  <td class="${diff === null ? "" : diff >= 0 ? "positivo" : "negativo"}">
+    ${diff === null ? "-" : diff.toFixed(1) + "%"}
+  </td>
 </tr>`;
   });
 }
 </script>
+
 </body>
 </html>
