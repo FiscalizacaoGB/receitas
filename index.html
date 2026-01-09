@@ -6,14 +6,13 @@
 <title>Resumo de Linhas - Cidade Sol</title>
 
 <style>
-/* ===== BASE ===== */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #f4f6f8;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header {
   background: #0b2545;
   padding: 10px 20px;
@@ -22,12 +21,12 @@ header img {
   height: 50px;
 }
 
-/* ===== SECTION ===== */
+/* SECTION */
 section {
   padding: 20px;
 }
 
-/* ===== CONTROLS ===== */
+/* CONTROLS */
 .controls {
   margin: 20px 0;
 }
@@ -36,7 +35,7 @@ select, button {
   margin-right: 10px;
 }
 
-/* ===== CARDS ===== */
+/* CARDS */
 .cards-resumo {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -59,12 +58,8 @@ select, button {
   font-weight: bold;
   color: #0b2545;
 }
-  <label style="margin-left:10px;">
-  <input type="checkbox" id="somarSeguro">
-  Tarifa + Seguro
-</label>
 
-/* ===== TABLE ===== */
+/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -83,7 +78,7 @@ th {
 .positivo { color: green; font-weight: bold; }
 .negativo { color: red; font-weight: bold; }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 @media (max-width: 768px) {
   .cards-resumo {
     grid-template-columns: 1fr 1fr;
@@ -109,185 +104,153 @@ th {
 </header>
 
 <section>
-  <h2>Resumo de Linhas</h2>
+<h2>Resumo de Linhas</h2>
 
-  <!-- ===== CARDS ===== -->
-  <div class="cards-resumo">
-    <div class="card">
-      <span class="label">Receita Total</span>
-      <span class="valor" id="cardReceita">R$ 0,00</span>
-    </div>
-    <div class="card">
-      <span class="label">KM Rodado</span>
-      <span class="valor" id="cardKm">0</span>
-    </div>
-    <div class="card">
-      <span class="label">Pax</span>
-      <span class="valor" id="cardPax">0</span>
-    </div>
-    <div class="card">
-      <span class="label">R$/KM Médio</span>
-      <span class="valor" id="cardRkm">0,00</span>
-    </div>
+<!-- CARDS -->
+<div class="cards-resumo">
+  <div class="card">
+    <span class="label">Receita Total</span>
+    <span class="valor" id="cardReceita">R$ 0,00</span>
   </div>
-
-  <!-- ===== FILTROS ===== -->
-  <div class="controls">
-    <select id="ano">
-      <option value="">Ano</option>
-      <option value="2024">2024</option>
-      <option value="2025">2025</option>
-      <option value="2026">2026</option>
-      <option value="2027">2027</option>
-    </select>
-
-    <select id="mes">
-      <option value="">Mês</option>
-      <option value="1">Janeiro</option>
-      <option value="2">Fevereiro</option>
-      <option value="3">Março</option>
-      <option value="4">Abril</option>
-      <option value="5">Maio</option>
-      <option value="6">Junho</option>
-      <option value="7">Julho</option>
-      <option value="8">Agosto</option>
-      <option value="9">Setembro</option>
-      <option value="10">Outubro</option>
-      <option value="11">Novembro</option>
-      <option value="12">Dezembro</option>
-    </select>
-
-    <select id="grupo">
-      <option value="todos">Todos</option>
-      <option>Grupo Alagoinhas</option>
-      <option>Grupo Recôncavo</option>
-      <option>Grupo Regional</option>
-    </select>
-
-    <button onclick="buscarLinhas()">Buscar</button>
+  <div class="card">
+    <span class="label">KM Rodado</span>
+    <span class="valor" id="cardKm">0</span>
   </div>
+  <div class="card">
+    <span class="label">Pax</span>
+    <span class="valor" id="cardPax">0</span>
+  </div>
+  <div class="card">
+    <span class="label">R$/KM Médio</span>
+    <span class="valor" id="cardRkm">0,00</span>
+  </div>
+</div>
 
-  <!-- ===== TABELA ===== -->
-  <table>
-    <thead>
-  <tr id="thead-row">
-    <th>Linha</th>
-    <th id="thReceita">Receita</th>
-    <th id="thSeguro">Seguro</th>
-    <th>KM</th>
-    <th>Pax</th>
-    <th>R$/KM</th>
-    <th>Δ R$/KM</th>
-  </tr>
+<!-- FILTROS -->
+<div class="controls">
+  <select id="ano">
+    <option value="">Ano</option>
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+    <option value="2026">2026</option>
+    <option value="2027">2027</option>
+  </select>
+
+  <select id="mes">
+    <option value="">Mês</option>
+    <option value="1">Janeiro</option>
+    <option value="2">Fevereiro</option>
+    <option value="3">Março</option>
+    <option value="4">Abril</option>
+    <option value="5">Maio</option>
+    <option value="6">Junho</option>
+    <option value="7">Julho</option>
+    <option value="8">Agosto</option>
+    <option value="9">Setembro</option>
+    <option value="10">Outubro</option>
+    <option value="11">Novembro</option>
+    <option value="12">Dezembro</option>
+  </select>
+
+  <select id="grupo">
+    <option value="todos">Todos</option>
+    <option>Grupo Alagoinhas</option>
+    <option>Grupo Recôncavo</option>
+    <option>Grupo Regional</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="somarSeguro">
+    Tarifa + Seguro
+  </label>
+
+  <button onclick="buscarLinhas()">Buscar</button>
+</div>
+
+<!-- TABELA -->
+<table>
+<thead>
+<tr>
+  <th>Linha</th>
+  <th>Receita</th>
+  <th id="thSeguro">Seguro</th>
+  <th>KM</th>
+  <th>Pax</th>
+  <th>R$/KM</th>
+  <th>Δ R$/KM</th>
+</tr>
 </thead>
-
-    <tbody id="tbody"></tbody>
-  </table>
+<tbody id="tbody"></tbody>
+</table>
 </section>
 
 <script>
-/* ===== URL API ===== */
 const URL_LINHAS =
-  "https://script.google.com/macros/s/AKfycbwlFxLgeub2VKAMwxCW8IBqVQliphQzqOBiSGyyJbjlLhKv882wQdupBxuPZQw1klz8Cg/exec";
+"https://script.google.com/macros/s/AKfycbx_fKvxZ3N0BcMcpa-U26D4csvOD2nI9ExvswodJwjSv2k5PR269jNvAwgjbBd28_h7RQ/exec";
 
-/* ===== UTILS ===== */
 function moeda(v) {
-  return Number(v).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
+  return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
-function decimal(v, c = 2) {
-  return Number(v).toLocaleString("pt-BR", {
-    minimumFractionDigits: c,
-    maximumFractionDigits: c
-  });
+function decimal(v,c=2){
+  return Number(v).toLocaleString("pt-BR",{minimumFractionDigits:c});
 }
-function soma(arr, campo) {
-  return arr.reduce((t, i) => t + (Number(i[campo]) || 0), 0);
+function soma(arr,campo){
+  return arr.reduce((t,i)=>t+(Number(i[campo])||0),0);
 }
 
-/* ===== BUSCAR LINHAS ===== */
-async function buscarLinhas() {
+async function buscarLinhas(){
   const ano = Number(document.getElementById("ano").value);
   const mes = Number(document.getElementById("mes").value);
   const grupo = document.getElementById("grupo").value;
-  const tbody = document.getElementById("tbody");
   const somarSeguro = document.getElementById("somarSeguro").checked;
-const thSeguro = document.getElementById("thSeguro");
+  const thSeguro = document.getElementById("thSeguro");
+  const tbody = document.getElementById("tbody");
 
-  if (!ano || !mes) {
-    alert("Selecione ano e mês");
-    return;
-  }
+  if(!ano||!mes){alert("Selecione ano e mês");return;}
 
-  tbody.innerHTML =
-    "<tr><td colspan='6'>Carregando...</td></tr>";
+  tbody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
 
   const res = await fetch(URL_LINHAS);
   const dados = await res.json();
 
- const atual = dados.filter(l =>
-  Number(l.Ano) === ano &&
-  Number(l.Mês) === mes &&
-  (grupo === "todos" || l.Grupo === grupo)
-).map(l => {
-  const tarifa = Number(l.Tarifa) || 0;
-  const seguro = Number(l.Seguro) || 0;
+  const atual = dados.filter(l =>
+    l.Ano===ano && l.Mês===mes && (grupo==="todos"||l.Grupo===grupo)
+  ).map(l=>{
+    const tarifa = Number(l.Tarifa)||0;
+    const seguro = Number(l.Seguro)||0;
+    return {...l,
+      ReceitaCalc: somarSeguro ? tarifa+seguro : tarifa,
+      SeguroCalc: seguro
+    };
+  });
 
-  return {
-    ...l,
-    ReceitaCalculada: somarSeguro ? tarifa + seguro : tarifa,
-    SeguroCalculado: seguro
-  };
-});
+  thSeguro.style.display = somarSeguro ? "none":"table-cell";
 
-
-  /* ===== CARDS ===== */
-  const totalReceita = atual.reduce(
-  (t, i) => t + i.ReceitaCalculada, 0);
-  const totalKm = soma(atual, "Km_Rodado");
-  const totalPax = soma(atual, "Qtd_Pax");
-  const rkmMedio = totalKm ? totalReceita / totalKm : 0;
+  const totalReceita = atual.reduce((t,i)=>t+i.ReceitaCalc,0);
+  const totalKm = soma(atual,"Km_Rodado");
+  const totalPax = soma(atual,"Qtd_Pax");
+  const rkmMedio = totalKm ? totalReceita/totalKm : 0;
 
   cardReceita.innerText = moeda(totalReceita);
-  cardKm.innerText = decimal(totalKm, 0);
-  cardPax.innerText = decimal(totalPax, 0);
-  cardRkm.innerText = decimal(rkmMedio, 2);
+  cardKm.innerText = decimal(totalKm,0);
+  cardPax.innerText = decimal(totalPax,0);
+  cardRkm.innerText = decimal(rkmMedio,2);
 
   tbody.innerHTML = "";
-const rkmMedio = totalKm ? totalReceita / totalKm : 0;
-  atual.forEach(l => {
-    const ant = dados.find(a =>
-      a.Linha === l.Linha &&
-      Number(a.Ano) === ano - 1 &&
-      Number(a.Mês) === mes
-    );
 
-    const diff = ant
-      ? ((l["R$/KM"] - ant["R$/KM"]) / ant["R$/KM"]) * 100
-      : null;
-
+  atual.forEach(l=>{
     tbody.innerHTML += `
 <tr>
-  <td>${l.Linha}</td>
-  <td>${moeda(l.ReceitaCalculada)}</td>
-  ${
-    somarSeguro
-      ? ""
-      : `<td>${moeda(l.SeguroCalculado)}</td>`
-  }
-  <td>${decimal(l.Km_Rodado, 0)}</td>
-  <td>${decimal(l.Qtd_Pax, 0)}</td>
-  <td>${decimal(l.ReceitaCalculada / l.Km_Rodado, 2)}</td>
-  <td class="${diff >= 0 ? "positivo" : "negativo"}">
-    ${diff === null ? "-" : diff.toFixed(1) + "%"}
-  </td>
+<td>${l.Linha}</td>
+<td>${moeda(l.ReceitaCalc)}</td>
+${somarSeguro?"":`<td>${moeda(l.SeguroCalc)}</td>`}
+<td>${decimal(l.Km_Rodado,0)}</td>
+<td>${decimal(l.Qtd_Pax,0)}</td>
+<td>${decimal(l.ReceitaCalc/l.Km_Rodado,2)}</td>
+<td>-</td>
 </tr>`;
-
   });
 }
 </script>
-
 </body>
 </html>
