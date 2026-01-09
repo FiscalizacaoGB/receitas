@@ -108,18 +108,31 @@ th {
 
 <!-- CARDS -->
 <div class="cards-resumo">
+  <div class="card" id="cardTarifaBox">
+    <span class="label">Tarifa Total</span>
+    <span class="valor" id="cardTarifa">R$ 0,00</span>
+  </div>
+
+  <div class="card" id="cardSeguroBox">
+    <span class="label">Seguro Total</span>
+    <span class="valor" id="cardSeguro">R$ 0,00</span>
+  </div>
+
   <div class="card">
     <span class="label">Receita Total</span>
     <span class="valor" id="cardReceita">R$ 0,00</span>
   </div>
+
   <div class="card">
     <span class="label">KM Rodado</span>
     <span class="valor" id="cardKm">0</span>
   </div>
+
   <div class="card">
     <span class="label">Pax</span>
     <span class="valor" id="cardPax">0</span>
   </div>
+
   <div class="card">
     <span class="label">R$/KM Médio</span>
     <span class="valor" id="cardRkm">0,00</span>
@@ -191,13 +204,12 @@ const URL_LINHAS =
 function moeda(v) {
   return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
-function decimal(v, c = 2){
-  return Number(v).toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+function decimal(v){
+  return Number(v).toLocaleString("pt-BR",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
   });
 }
-
 function soma(arr,campo){
   return arr.reduce((t,i)=>t+(Number(i[campo])||0),0);
 }
@@ -224,46 +236,35 @@ async function buscarLinhas(){
     l.Ano === ano &&
     l.Mês === mes &&
     (grupo === "todos" || l.Grupo === grupo)
-  ).map(l => {
-    const tarifa = Number(l.Tarifa) || 0;
-    const seguro = Number(l.Seguro) || 0;
+  );
 
-    return {
-      ...l,
-      ReceitaCalc: somarSeguro ? tarifa + seguro : tarifa,
-      SeguroCalc: seguro
-    };
-  });
-
-  thSeguro.style.display = somarSeguro ? "none" : "table-cell";
-
-  /* ===== CARDS ===== */
-  const totalReceita = atual.reduce((t,i)=>t+i.ReceitaCalc,0);
+  /* ===== SOMATÓRIOS ===== */
+  const totalTarifa = soma(atual,"Tarifa");
+  const totalSeguro = soma(atual,"Seguro");
+  const receitaTotal = totalTarifa + totalSeguro;
   const totalKm = soma(atual,"Km_Rodado");
   const totalPax = soma(atual,"Qtd_Pax");
+  const rkmMedio = totalKm ? receitaTotal / totalKm : 0;
 
-  // ✅ R$/KM médio EXTRAÍDO da planilha (média simples)
-  // Receita TOTAL REAL = Tarifa + Seguro (sempre)
-const receitaTotalReal = atual.reduce((t, l) => {
-  const tarifa = Number(l.Tarifa) || 0;
-  const seguro = Number(l.Seguro) || 0;
-  return t + tarifa + seguro;
-}, 0);
+  /* ===== CONTROLE DE VISIBILIDADE ===== */
+  document.getElementById("cardTarifaBox").style.display =
+    somarSeguro ? "none" : "block";
+  document.getElementById("cardSeguroBox").style.display =
+    somarSeguro ? "none" : "block";
+  thSeguro.style.display = somarSeguro ? "none" : "table-cell";
 
-// R$/KM médio GERENCIAL
-const rkmMedio = totalKm ? receitaTotalReal / totalKm : 0;
+  /* ===== ATUALIZA CARDS ===== */
+  cardTarifa.innerText = moeda(totalTarifa);
+  cardSeguro.innerText = moeda(totalSeguro);
+  cardReceita.innerText = moeda(receitaTotal);
+  cardKm.innerText = decimal(totalKm);
+  cardPax.innerText = decimal(totalPax);
+  cardRkm.innerText = decimal(rkmMedio);
 
-
-  cardReceita.innerText = moeda(totalReceita);
-  cardKm.innerText = decimal(totalKm,0);
-  cardPax.innerText = decimal(totalPax,0);
-  cardRkm.innerText = decimal(rkmMedio,2);
-
+  /* ===== TABELA ===== */
   tbody.innerHTML = "";
 
   atual.forEach(l => {
-
-    // 🔁 Comparação com mês anterior usando R$/KM da planilha
     const ant = dados.find(a =>
       a.Linha === l.Linha &&
       a.Ano === ano - 1 &&
@@ -274,14 +275,18 @@ const rkmMedio = totalKm ? receitaTotalReal / totalKm : 0;
       ? ((l["R$/KM"] - ant["R$/KM"]) / ant["R$/KM"]) * 100
       : null;
 
+    const receitaLinha = somarSeguro
+      ? (Number(l.Tarifa) + Number(l.Seguro))
+      : Number(l.Tarifa);
+
     tbody.innerHTML += `
 <tr>
   <td>${l.Linha}</td>
-  <td>${moeda(l.ReceitaCalc)}</td>
-  ${somarSeguro ? "" : `<td>${moeda(l.SeguroCalc)}</td>`}
-  <td>${decimal(l.Km_Rodado,0)}</td>
-  <td>${decimal(l.Qtd_Pax,0)}</td>
-  <td>${decimal(l["R$/KM"],2)}</td>
+  <td>${moeda(receitaLinha)}</td>
+  ${somarSeguro ? "" : `<td>${moeda(l.Seguro)}</td>`}
+  <td>${decimal(l.Km_Rodado)}</td>
+  <td>${decimal(l.Qtd_Pax)}</td>
+  <td>${decimal(l["R$/KM"])}</td>
   <td class="${diff === null ? "" : diff >= 0 ? "positivo" : "negativo"}">
     ${diff === null ? "-" : diff.toFixed(2) + "%"}
   </td>
