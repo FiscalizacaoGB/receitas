@@ -59,6 +59,10 @@ select, button {
   font-weight: bold;
   color: #0b2545;
 }
+  <label style="margin-left:10px;">
+  <input type="checkbox" id="somarSeguro">
+  Tarifa + Seguro
+</label>
 
 /* ===== TABLE ===== */
 table {
@@ -166,15 +170,17 @@ th {
   <!-- ===== TABELA ===== -->
   <table>
     <thead>
-      <tr>
-        <th>Linha</th>
-        <th>Receita</th>
-        <th>KM</th>
-        <th>Pax</th>
-        <th>R$/KM</th>
-        <th>Δ R$/KM</th>
-      </tr>
-    </thead>
+  <tr id="thead-row">
+    <th>Linha</th>
+    <th id="thReceita">Receita</th>
+    <th id="thSeguro">Seguro</th>
+    <th>KM</th>
+    <th>Pax</th>
+    <th>R$/KM</th>
+    <th>Δ R$/KM</th>
+  </tr>
+</thead>
+
     <tbody id="tbody"></tbody>
   </table>
 </section>
@@ -207,6 +213,8 @@ async function buscarLinhas() {
   const mes = Number(document.getElementById("mes").value);
   const grupo = document.getElementById("grupo").value;
   const tbody = document.getElementById("tbody");
+  const somarSeguro = document.getElementById("somarSeguro").checked;
+const thSeguro = document.getElementById("thSeguro");
 
   if (!ano || !mes) {
     alert("Selecione ano e mês");
@@ -219,20 +227,25 @@ async function buscarLinhas() {
   const res = await fetch(URL_LINHAS);
   const dados = await res.json();
 
-  const atual = dados.filter(l =>
-    Number(l.Ano) === ano &&
-    Number(l.Mês) === mes &&
-    (grupo === "todos" || l.Grupo === grupo)
-  );
+ const atual = dados.filter(l =>
+  Number(l.Ano) === ano &&
+  Number(l.Mês) === mes &&
+  (grupo === "todos" || l.Grupo === grupo)
+).map(l => {
+  const tarifa = Number(l.Tarifa) || 0;
+  const seguro = Number(l.Seguro) || 0;
 
-  if (!atual.length) {
-    tbody.innerHTML =
-      "<tr><td colspan='6'>Nenhum dado encontrado</td></tr>";
-    return;
-  }
+  return {
+    ...l,
+    ReceitaCalculada: somarSeguro ? tarifa + seguro : tarifa,
+    SeguroCalculado: seguro
+  };
+});
+
 
   /* ===== CARDS ===== */
-  const totalReceita = soma(atual, "Receita");
+  const totalReceita = atual.reduce(
+  (t, i) => t + i.ReceitaCalculada, 0);
   const totalKm = soma(atual, "Km_Rodado");
   const totalPax = soma(atual, "Qtd_Pax");
   const rkmMedio = totalKm ? totalReceita / totalKm : 0;
@@ -243,7 +256,7 @@ async function buscarLinhas() {
   cardRkm.innerText = decimal(rkmMedio, 2);
 
   tbody.innerHTML = "";
-
+const rkmMedio = totalKm ? totalReceita / totalKm : 0;
   atual.forEach(l => {
     const ant = dados.find(a =>
       a.Linha === l.Linha &&
@@ -256,16 +269,22 @@ async function buscarLinhas() {
       : null;
 
     tbody.innerHTML += `
-      <tr>
-        <td>${l.Linha}</td>
-        <td>${moeda(l.Receita)}</td>
-        <td>${decimal(l.Km_Rodado, 0)}</td>
-        <td>${decimal(l.Qtd_Pax, 0)}</td>
-        <td>${decimal(l["R$/KM"], 2)}</td>
-        <td class="${diff >= 0 ? "positivo" : "negativo"}">
-          ${diff === null ? "-" : diff.toFixed(1) + "%"}
-        </td>
-      </tr>`;
+<tr>
+  <td>${l.Linha}</td>
+  <td>${moeda(l.ReceitaCalculada)}</td>
+  ${
+    somarSeguro
+      ? ""
+      : `<td>${moeda(l.SeguroCalculado)}</td>`
+  }
+  <td>${decimal(l.Km_Rodado, 0)}</td>
+  <td>${decimal(l.Qtd_Pax, 0)}</td>
+  <td>${decimal(l.ReceitaCalculada / l.Km_Rodado, 2)}</td>
+  <td class="${diff >= 0 ? "positivo" : "negativo"}">
+    ${diff === null ? "-" : diff.toFixed(1) + "%"}
+  </td>
+</tr>`;
+
   });
 }
 </script>
