@@ -239,9 +239,16 @@ async function buscarLinhas(){
   const totalPax = soma(atual,"Qtd_Pax");
 
   // ✅ R$/KM médio EXTRAÍDO da planilha (média simples)
-  const rkmMedio = atual.length
-    ? soma(atual,"R$/KM") / atual.length
-    : 0;
+  // Receita TOTAL REAL = Tarifa + Seguro (sempre)
+const receitaTotalReal = atual.reduce((t, l) => {
+  const tarifa = Number(l.Tarifa) || 0;
+  const seguro = Number(l.Seguro) || 0;
+  return t + tarifa + seguro;
+}, 0);
+
+// R$/KM médio GERENCIAL
+const rkmMedio = totalKm ? receitaTotalReal / totalKm : 0;
+
 
   cardReceita.innerText = moeda(totalReceita);
   cardKm.innerText = decimal(totalKm,0);
