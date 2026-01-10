@@ -196,6 +196,32 @@ th {
 </table>
 </section>
 
+  <script>
+/* ===== SEGURANÇA / AUTENTICAÇÃO ===== */
+const AUTH_API = "COLE_AQUI_A_URL_DO_WEB_APP";
+
+const token = sessionStorage.getItem("token");
+if (!token) {
+  window.location.href = "login.html";
+}
+
+fetch(AUTH_API, {
+  method: "POST",
+  body: JSON.stringify({ token })
+})
+.then(r => r.json())
+.then(d => {
+  if (d.status !== "ok") {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  }
+})
+.catch(() => {
+  sessionStorage.clear();
+  window.location.href = "login.html";
+});
+</script>
+
 <script>
 const URL_LINHAS =
 "https://script.google.com/macros/s/AKfycbx_fKvxZ3N0BcMcpa-U26D4csvOD2nI9ExvswodJwjSv2k5PR269jNvAwgjbBd28_h7RQ/exec";
