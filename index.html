@@ -198,16 +198,21 @@ th {
 
   <script>
 /* ===== SEGURANÇA / AUTENTICAÇÃO ===== */
+<script>
 const AUTH_API = "https://script.google.com/macros/s/AKfycbwhOf-cQ-b8lyt60kfrYlfDjvafphoWxmRgIUiuZAI28oZbojv5LHjttmprTNMlq1RG/exec";
 
 const token = sessionStorage.getItem("token");
+
 if (!token) {
   window.location.href = "login.html";
 }
 
 fetch(AUTH_API, {
   method: "POST",
-  body: JSON.stringify({ token })
+  body: JSON.stringify({
+    acao: "validar",
+    token: token
+  })
 })
 .then(r => r.json())
 .then(d => {
@@ -221,6 +226,7 @@ fetch(AUTH_API, {
   window.location.href = "login.html";
 });
 </script>
+
 
 <script>
 const URL_LINHAS =
