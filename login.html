@@ -2,34 +2,121 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login - Sistema Interno</title>
-</head>
-<body>
 
-<h2>Login</h2>
+<style>
+* {
+  box-sizing: border-box;
+}
 
-<input id="usuario" placeholder="Usuário"><br><br>
-<input id="senha" type="password" placeholder="Senha"><br><br>
-<button onclick="login()">Entrar</button>
-  <script>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0b2545;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 380px;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logo img {
+  max-width: 180px;
+  width: 100%;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0b2545;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #0b2545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #163a6b;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    margin: 0 12px;
+    padding: 28px 20px;
+  }
+
+  .logo img {
+    max-width: 150px;
+  }
+}
+</style>
+
+<script>
 /* ===== LIMPA SESSÃO AO ABRIR LOGIN ===== */
 sessionStorage.clear();
 </script>
+</head>
 
+<body>
+
+<div class="login-container">
+
+  <div class="logo">
+    <img src="logo.png" alt="Cidade Sol">
+  </div>
+
+  <h2>Acesso Interno</h2>
+
+  <input id="usuario" placeholder="Usuário">
+  <input id="senha" type="password" placeholder="Senha">
+
+  <button onclick="login()">Entrar</button>
+
+</div>
 
 <script>
-  
 const API_URL = "https://script.google.com/macros/s/AKfycbwg-_UhoiovL7rz6NmncH2AZm7c-AYI2FiM926hvbr4QSpW_CBpIwv8xP0DRJbse6Zb/exec";
 
 function login() {
-fetch(API_URL, {
-  method: "POST",
-  body: JSON.stringify({
-    acao: "login",
-    usuario: usuario.value,
-    senha: senha.value
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      acao: "login",
+      usuario: usuario.value.trim(),
+      senha: senha.value
+    })
   })
-})
   .then(r => r.json())
   .then(d => {
     if (d.status === "ok") {
