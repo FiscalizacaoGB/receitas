@@ -11,8 +11,14 @@
 <input id="usuario" placeholder="Usuário"><br><br>
 <input id="senha" type="password" placeholder="Senha"><br><br>
 <button onclick="login()">Entrar</button>
+  <script>
+/* ===== LIMPA SESSÃO AO ABRIR LOGIN ===== */
+sessionStorage.clear();
+</script>
+
 
 <script>
+  
 const API_URL = "https://script.google.com/macros/s/AKfycbwg-_UhoiovL7rz6NmncH2AZm7c-AYI2FiM926hvbr4QSpW_CBpIwv8xP0DRJbse6Zb/exec";
 
 function login() {
