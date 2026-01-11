@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <script>
-/* ===== BLOQUEIO TOTAL DE ACESSO ===== */
+
+<script>
+/* BLOQUEIO IMEDIATO */
 if (!sessionStorage.getItem("token")) {
   window.location.replace("login.html");
 }
@@ -23,24 +24,26 @@ body {
 header {
   background: #0b2545;
   padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-header img {
-  height: 50px;
+header img { height: 50px; }
+
+header button {
+  background: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 /* SECTION */
-section {
-  padding: 20px;
-}
+section { padding: 20px; }
 
 /* CONTROLS */
-.controls {
-  margin: 20px 0;
-}
-select, button {
-  padding: 8px;
-  margin-right: 10px;
-}
+.controls { margin: 20px 0; }
+select, button { padding: 8px; margin-right: 10px; }
 
 /* CARDS */
 .cards-resumo {
@@ -78,28 +81,18 @@ th, td {
   font-size: 14px;
   text-align: center;
 }
-th {
-  background: #eee;
-}
+th { background: #eee; }
 
 .positivo { color: green; font-weight: bold; }
 .negativo { color: red; font-weight: bold; }
 
 /* MOBILE */
 @media (max-width: 768px) {
-  .cards-resumo {
-    grid-template-columns: 1fr 1fr;
-  }
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+  .cards-resumo { grid-template-columns: 1fr 1fr; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
 }
 @media (max-width: 480px) {
-  .cards-resumo {
-    grid-template-columns: 1fr;
-  }
+  .cards-resumo { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -108,41 +101,44 @@ th {
 
 <header>
   <img src="logo.png" alt="Cidade Sol">
+  <button onclick="logout()">Sair</button>
 </header>
 
 <section>
 <h2>Resumo de Linhas</h2>
 
-<!-- CARDS -->
-<div class="cards-resumo">
-  <div class="card" id="cardTarifaBox">
-    <span class="label">Tarifa Total</span>
-    <span class="valor" id="cardTarifa">R$ 0,00</span>
-  </div>
+<!-- CARDS (OCULTOS INICIALMENTE) -->
+<div id="cardsContainer" style="display:none;">
+  <div class="cards-resumo">
+    <div class="card" id="cardTarifaBox">
+      <span class="label">Tarifa Total</span>
+      <span class="valor" id="cardTarifa">R$ 0,00</span>
+    </div>
 
-  <div class="card" id="cardSeguroBox">
-    <span class="label">Seguro Total</span>
-    <span class="valor" id="cardSeguro">R$ 0,00</span>
-  </div>
+    <div class="card" id="cardSeguroBox">
+      <span class="label">Seguro Total</span>
+      <span class="valor" id="cardSeguro">R$ 0,00</span>
+    </div>
 
-  <div class="card">
-    <span class="label">Receita Total</span>
-    <span class="valor" id="cardReceita">R$ 0,00</span>
-  </div>
+    <div class="card">
+      <span class="label">Receita Total</span>
+      <span class="valor" id="cardReceita">R$ 0,00</span>
+    </div>
 
-  <div class="card">
-    <span class="label">KM Rodado</span>
-    <span class="valor" id="cardKm">0</span>
-  </div>
+    <div class="card">
+      <span class="label">KM Rodado</span>
+      <span class="valor" id="cardKm">0</span>
+    </div>
 
-  <div class="card">
-    <span class="label">Pax</span>
-    <span class="valor" id="cardPax">0</span>
-  </div>
+    <div class="card">
+      <span class="label">Pax</span>
+      <span class="valor" id="cardPax">0</span>
+    </div>
 
-  <div class="card">
-    <span class="label">R$/KM Médio</span>
-    <span class="valor" id="cardRkm">0,00</span>
+    <div class="card">
+      <span class="label">R$/KM Médio</span>
+      <span class="valor" id="cardRkm">0,00</span>
+    </div>
   </div>
 </div>
 
@@ -179,14 +175,12 @@ th {
   </select>
 
   <label>
-    <input type="checkbox" id="somarSeguro">
-    Tarifa + Seguro
+    <input type="checkbox" id="somarSeguro"> Tarifa + Seguro
   </label>
 
   <button onclick="buscarLinhas()">Buscar</button>
 </div>
 
-<!-- TABELA -->
 <table>
 <thead>
 <tr>
@@ -203,131 +197,80 @@ th {
 </table>
 </section>
 
-  <script>
-/* ===== SEGURANÇA / AUTENTICAÇÃO ===== */
 <script>
 const AUTH_API = "https://script.google.com/macros/s/AKfycbwg-_UhoiovL7rz6NmncH2AZm7c-AYI2FiM926hvbr4QSpW_CBpIwv8xP0DRJbse6Zb/exec";
-
-const token = sessionStorage.getItem("token");
-
-if (!token) {
-  window.location.href = "login.html";
-}
 
 fetch(AUTH_API, {
   method: "POST",
   body: JSON.stringify({
     acao: "validar",
-    token: token
+    token: sessionStorage.getItem("token")
   })
 })
 .then(r => r.json())
 .then(d => {
-  if (d.status !== "ok") {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-  }
+  if (d.status !== "ok") logout();
 })
-.catch(() => {
+.catch(logout);
+
+function logout() {
   sessionStorage.clear();
   window.location.href = "login.html";
-});
+}
 </script>
 
-
 <script>
-const URL_LINHAS =
-"https://script.google.com/macros/s/AKfycbx_fKvxZ3N0BcMcpa-U26D4csvOD2nI9ExvswodJwjSv2k5PR269jNvAwgjbBd28_h7RQ/exec";
+const URL_LINHAS = "https://script.google.com/macros/s/AKfycbx_fKvxZ3N0BcMcpa-U26D4csvOD2nI9ExvswodJwjSv2k5PR269jNvAwgjbBd28_h7RQ/exec";
 
-function moeda(v) {
-  return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-function decimal(v){
-  return Number(v).toLocaleString("pt-BR",{
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  });
-}
-function soma(arr,campo){
-  return arr.reduce((t,i)=>t+(Number(i[campo])||0),0);
-}
+function moeda(v){ return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function decimal(v){ return Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function soma(arr,c){ return arr.reduce((t,i)=>t+(Number(i[c])||0),0); }
 
 async function buscarLinhas(){
-  const ano = Number(document.getElementById("ano").value);
-  const mes = Number(document.getElementById("mes").value);
-  const grupo = document.getElementById("grupo").value;
-  const somarSeguro = document.getElementById("somarSeguro").checked;
-  const thSeguro = document.getElementById("thSeguro");
+  const ano = Number(ano.value);
+  const mes = Number(mes.value);
+  const grupo = grupo.value;
+  const somarSeguro = somarSeguro.checked;
   const tbody = document.getElementById("tbody");
+  const thSeguro = document.getElementById("thSeguro");
 
-  if(!ano||!mes){
-    alert("Selecione ano e mês");
+  if(!ano || !mes){ alert("Selecione ano e mês"); return; }
+
+  document.getElementById("cardsContainer").style.display = "block";
+  tbody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
+
+  const dados = await fetch(URL_LINHAS).then(r=>r.json());
+
+  const atual = dados.filter(l =>
+    l.Ano === ano && l.Mês === mes && (grupo === "todos" || l.Grupo === grupo)
+  );
+
+  if(atual.length === 0){
+    document.getElementById("cardsContainer").style.display = "none";
+    tbody.innerHTML = "<tr><td colspan='7'>Nenhum dado encontrado</td></tr>";
     return;
   }
 
-  tbody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
+  cardTarifa.innerText = moeda(soma(atual,"Tarifa"));
+  cardSeguro.innerText = moeda(soma(atual,"Seguro"));
+  cardReceita.innerText = moeda(soma(atual,"Tarifa")+soma(atual,"Seguro"));
+  cardKm.innerText = decimal(soma(atual,"Km_Rodado"));
+  cardPax.innerText = decimal(soma(atual,"Qtd_Pax"));
+  cardRkm.innerText = decimal((soma(atual,"Tarifa")+soma(atual,"Seguro"))/soma(atual,"Km_Rodado"));
 
-  const res = await fetch(URL_LINHAS);
-  const dados = await res.json();
-
-  const atual = dados.filter(l =>
-    l.Ano === ano &&
-    l.Mês === mes &&
-    (grupo === "todos" || l.Grupo === grupo)
-  );
-
-  /* ===== SOMATÓRIOS ===== */
-  const totalTarifa = soma(atual,"Tarifa");
-  const totalSeguro = soma(atual,"Seguro");
-  const receitaTotal = totalTarifa + totalSeguro;
-  const totalKm = soma(atual,"Km_Rodado");
-  const totalPax = soma(atual,"Qtd_Pax");
-  const rkmMedio = totalKm ? receitaTotal / totalKm : 0;
-
-  /* ===== CONTROLE DE VISIBILIDADE ===== */
-  document.getElementById("cardTarifaBox").style.display =
-    somarSeguro ? "none" : "block";
-  document.getElementById("cardSeguroBox").style.display =
-    somarSeguro ? "none" : "block";
   thSeguro.style.display = somarSeguro ? "none" : "table-cell";
-
-  /* ===== ATUALIZA CARDS ===== */
-  cardTarifa.innerText = moeda(totalTarifa);
-  cardSeguro.innerText = moeda(totalSeguro);
-  cardReceita.innerText = moeda(receitaTotal);
-  cardKm.innerText = decimal(totalKm);
-  cardPax.innerText = decimal(totalPax);
-  cardRkm.innerText = decimal(rkmMedio);
-
-  /* ===== TABELA ===== */
   tbody.innerHTML = "";
 
-  atual.forEach(l => {
-    const ant = dados.find(a =>
-      a.Linha === l.Linha &&
-      a.Ano === ano - 1 &&
-      a.Mês === mes
-    );
-
-    const diff = ant
-      ? ((l["R$/KM"] - ant["R$/KM"]) / ant["R$/KM"]) * 100
-      : null;
-
-    const receitaLinha = somarSeguro
-      ? (Number(l.Tarifa) + Number(l.Seguro))
-      : Number(l.Tarifa);
-
-    tbody.innerHTML += `
+  atual.forEach(l=>{
+    tbody.innerHTML+=`
 <tr>
-  <td>${l.Linha}</td>
-  <td>${moeda(receitaLinha)}</td>
-  ${somarSeguro ? "" : `<td>${moeda(l.Seguro)}</td>`}
-  <td>${decimal(l.Km_Rodado)}</td>
-  <td>${decimal(l.Qtd_Pax)}</td>
-  <td>${decimal(l["R$/KM"])}</td>
-  <td class="${diff === null ? "" : diff >= 0 ? "positivo" : "negativo"}">
-    ${diff === null ? "-" : diff.toFixed(2) + "%"}
-  </td>
+<td>${l.Linha}</td>
+<td>${moeda(somarSeguro ? Number(l.Tarifa)+Number(l.Seguro):l.Tarifa)}</td>
+${somarSeguro?"":`<td>${moeda(l.Seguro)}</td>`}
+<td>${decimal(l.Km_Rodado)}</td>
+<td>${decimal(l.Qtd_Pax)}</td>
+<td>${decimal(l["R$/KM"])}</td>
+<td>-</td>
 </tr>`;
   });
 }
