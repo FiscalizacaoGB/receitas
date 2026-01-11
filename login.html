@@ -6,9 +6,7 @@
 <title>Login - Sistema Interno</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -66,7 +64,12 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button.loading {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+button:hover:not(.loading) {
   background: #163a6b;
 }
 
@@ -75,15 +78,12 @@ button:hover {
     margin: 0 12px;
     padding: 28px 20px;
   }
-
-  .logo img {
-    max-width: 150px;
-  }
+  .logo img { max-width: 150px; }
 }
 </style>
 
 <script>
-/* ===== LIMPA SESSÃO AO ABRIR LOGIN ===== */
+/* LIMPA SESSÃO AO ABRIR LOGIN */
 sessionStorage.clear();
 </script>
 </head>
@@ -101,7 +101,7 @@ sessionStorage.clear();
   <input id="usuario" placeholder="Usuário">
   <input id="senha" type="password" placeholder="Senha">
 
-  <button onclick="login()">Entrar</button>
+  <button id="btnLogin" onclick="login()">Entrar</button>
 
 </div>
 
@@ -109,6 +109,11 @@ sessionStorage.clear();
 const API_URL = "https://script.google.com/macros/s/AKfycbwg-_UhoiovL7rz6NmncH2AZm7c-AYI2FiM926hvbr4QSpW_CBpIwv8xP0DRJbse6Zb/exec";
 
 function login() {
+  const btn = document.getElementById("btnLogin");
+  btn.innerText = "Entrando...";
+  btn.classList.add("loading");
+  btn.disabled = true;
+
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({
@@ -124,8 +129,20 @@ function login() {
       window.location.href = "index.html";
     } else {
       alert("Login inválido");
+      resetBtn();
     }
+  })
+  .catch(() => {
+    alert("Erro ao conectar");
+    resetBtn();
   });
+}
+
+function resetBtn() {
+  const btn = document.getElementById("btnLogin");
+  btn.innerText = "Entrar";
+  btn.classList.remove("loading");
+  btn.disabled = false;
 }
 </script>
 
