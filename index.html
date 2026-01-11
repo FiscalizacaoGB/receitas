@@ -226,54 +226,83 @@ function moeda(v){ return Number(v).toLocaleString("pt-BR",{style:"currency",cur
 function decimal(v){ return Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function soma(arr,c){ return arr.reduce((t,i)=>t+(Number(i[c])||0),0); }
 
-async function buscarLinhas(){
-  const ano = Number(ano.value);
-  const mes = Number(mes.value);
-  const grupo = grupo.value;
-  const somarSeguro = somarSeguro.checked;
+async function buscarLinhas() {
+  const anoSel = Number(document.getElementById("ano").value);
+  const mesSel = Number(document.getElementById("mes").value);
+  const grupoSel = document.getElementById("grupo").value;
+  const somarSeguroSel = document.getElementById("somarSeguro").checked;
+
   const tbody = document.getElementById("tbody");
   const thSeguro = document.getElementById("thSeguro");
+  const cardsContainer = document.getElementById("cardsContainer");
 
-  if(!ano || !mes){ alert("Selecione ano e mês"); return; }
+  if (!anoSel || !mesSel) {
+    alert("Selecione ano e mês");
+    return;
+  }
 
-  document.getElementById("cardsContainer").style.display = "block";
+  cardsContainer.style.display = "block";
   tbody.innerHTML = "<tr><td colspan='7'>Carregando...</td></tr>";
 
-  const dados = await fetch(URL_LINHAS).then(r=>r.json());
+  const res = await fetch(URL_LINHAS);
+  const dados = await res.json();
 
   const atual = dados.filter(l =>
-    l.Ano === ano && l.Mês === mes && (grupo === "todos" || l.Grupo === grupo)
+    l.Ano === anoSel &&
+    l.Mês === mesSel &&
+    (grupoSel === "todos" || l.Grupo === grupoSel)
   );
 
-  if(atual.length === 0){
-    document.getElementById("cardsContainer").style.display = "none";
+  if (atual.length === 0) {
+    cardsContainer.style.display = "none";
     tbody.innerHTML = "<tr><td colspan='7'>Nenhum dado encontrado</td></tr>";
     return;
   }
 
-  cardTarifa.innerText = moeda(soma(atual,"Tarifa"));
-  cardSeguro.innerText = moeda(soma(atual,"Seguro"));
-  cardReceita.innerText = moeda(soma(atual,"Tarifa")+soma(atual,"Seguro"));
-  cardKm.innerText = decimal(soma(atual,"Km_Rodado"));
-  cardPax.innerText = decimal(soma(atual,"Qtd_Pax"));
-  cardRkm.innerText = decimal((soma(atual,"Tarifa")+soma(atual,"Seguro"))/soma(atual,"Km_Rodado"));
+  /* ===== SOMATÓRIOS ===== */
+  const totalTarifa = soma(atual, "Tarifa");
+  const totalSeguro = soma(atual, "Seguro");
+  const receitaTotal = totalTarifa + totalSeguro;
+  const totalKm = soma(atual, "Km_Rodado");
+  const totalPax = soma(atual, "Qtd_Pax");
+  const rkmMedio = totalKm ? receitaTotal / totalKm : 0;
 
-  thSeguro.style.display = somarSeguro ? "none" : "table-cell";
+  /* ===== VISIBILIDADE ===== */
+  document.getElementById("cardTarifaBox").style.display =
+    somarSeguroSel ? "none" : "block";
+  document.getElementById("cardSeguroBox").style.display =
+    somarSeguroSel ? "none" : "block";
+  thSeguro.style.display = somarSeguroSel ? "none" : "table-cell";
+
+  /* ===== ATUALIZA CARDS ===== */
+  cardTarifa.innerText = moeda(totalTarifa);
+  cardSeguro.innerText = moeda(totalSeguro);
+  cardReceita.innerText = moeda(receitaTotal);
+  cardKm.innerText = decimal(totalKm);
+  cardPax.innerText = decimal(totalPax);
+  cardRkm.innerText = decimal(rkmMedio);
+
+  /* ===== TABELA ===== */
   tbody.innerHTML = "";
 
-  atual.forEach(l=>{
-    tbody.innerHTML+=`
+  atual.forEach(l => {
+    const receitaLinha = somarSeguroSel
+      ? Number(l.Tarifa) + Number(l.Seguro)
+      : Number(l.Tarifa);
+
+    tbody.innerHTML += `
 <tr>
-<td>${l.Linha}</td>
-<td>${moeda(somarSeguro ? Number(l.Tarifa)+Number(l.Seguro):l.Tarifa)}</td>
-${somarSeguro?"":`<td>${moeda(l.Seguro)}</td>`}
-<td>${decimal(l.Km_Rodado)}</td>
-<td>${decimal(l.Qtd_Pax)}</td>
-<td>${decimal(l["R$/KM"])}</td>
-<td>-</td>
+  <td>${l.Linha}</td>
+  <td>${moeda(receitaLinha)}</td>
+  ${somarSeguroSel ? "" : `<td>${moeda(l.Seguro)}</td>`}
+  <td>${decimal(l.Km_Rodado)}</td>
+  <td>${decimal(l.Qtd_Pax)}</td>
+  <td>${decimal(l["R$/KM"])}</td>
+  <td>-</td>
 </tr>`;
   });
 }
+
 </script>
 
 </body>
